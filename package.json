@@ -1,6 +1,6 @@
 {
   "name": "root",
-  "private": true,
+  "private": false,
   "license": "MPL-2.0",
   "scripts": {
     "install-lerna": "npm install --no-package-lock",
@@ -9,7 +9,7 @@
     "install-new-packages": "lerna bootstrap --hoist",
     "test": "jest --coverage=true --config=jest.config.js",
     "build": "lerna run build --concurrency 1",
-    "prepublishOnly": "npm run test && npm run build && cp README.md packages/matrix-crdt/README.md",
+    "prepublishOnly": "npm run build && cp README.md packages/matrix-crdt/README.md",
     "postpublish": "rm -rf packages/matrix-crdt/README.md",
     "deploy": "lerna publish",
     "redeploy": "lerna publish from-package",
