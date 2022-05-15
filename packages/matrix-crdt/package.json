@@ -1,5 +1,5 @@
 {
-  "name": "matrix-crdt",
+  "name": "@jacobcoro/matrix-crdt",
   "description": "",
   "homepage": "https://github.com/YousefED/matrix-crdt",
   "author": {
@@ -56,5 +56,6 @@
     "test": "jest --coverage=true --config=jest.config.js",
     "watch": "tsc --watch",
     "bench": "NODE_OPTIONS='--max-old-space-size=4096' ts-node --files -O '{\"module\":\"commonjs\"}' src/matrix-crdt/benchmark/benchmarkTest.ts "
-  }
+  },
+  "gitHead": "517f0f3924a3aebb913c00f874e200a190bb8f47"
 }
