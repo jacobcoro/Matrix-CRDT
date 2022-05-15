@@ -1,6 +1,6 @@
 {
   "name": "richtext",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "private": true,
   "dependencies": {
     "@primer/css": "^19.1.1",
