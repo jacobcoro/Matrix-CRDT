@@ -15,6 +15,9 @@
     "redeploy": "lerna publish from-package",
     "watch": "lerna run watch"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "devDependencies": {
     "lerna": "^4.0.0",
     "@types/jest": "^27.4.0",
