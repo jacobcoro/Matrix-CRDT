@@ -57,8 +57,5 @@
     "watch": "tsc --watch",
     "bench": "NODE_OPTIONS='--max-old-space-size=4096' ts-node --files -O '{\"module\":\"commonjs\"}' src/matrix-crdt/benchmark/benchmarkTest.ts "
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "gitHead": "5049409d22a69be9c841fb5fb9a35c973f7329df"
 }
