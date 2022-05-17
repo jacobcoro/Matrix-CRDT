@@ -1,16 +1,7 @@
 import { MatrixClient } from "matrix-js-sdk";
 import { event, lifecycle } from "vscode-lib";
 import * as awarenessProtocol from "y-protocols/awareness";
-import {
-  applyUpdate,
-  diffUpdate,
-  Doc,
-  encodeStateAsUpdate,
-  encodeStateVectorFromUpdate,
-  mergeUpdates,
-  snapshot,
-  Snapshot,
-} from "yjs";
+import * as Y from "yjs";
 import { signObject, verifyObject } from "./util/authUtil";
 import { MatrixMemberReader } from "./memberReader/MatrixMemberReader";
 import { MatrixReader, MatrixReaderOptions } from "./reader/MatrixReader";
@@ -144,7 +135,7 @@ export class MatrixProvider extends lifecycle.Disposable {
    * @memberof MatrixProvider
    */
   public constructor(
-    private doc: Doc,
+    private doc: Y.Doc,
     private matrixClient: MatrixClient,
 
     private room:
@@ -219,7 +210,7 @@ export class MatrixProvider extends lifecycle.Disposable {
       (e) => new Uint8Array(decodeBase64(e.content.update))
     );
 
-    const update = mergeUpdates(updates);
+    const update = Y.mergeUpdates(updates);
 
     if (!updates.length) {
       // We still return an empty "update" here, because this is
@@ -229,12 +220,12 @@ export class MatrixProvider extends lifecycle.Disposable {
     }
 
     // Apply latest state from server
-    applyUpdate(this.doc, update, this);
+    Y.applyUpdate(this.doc, update, this);
 
     // Create and send a snapsnot if necessary
     if (shouldSendSnapshot) {
       const lastEvent = events[events.length - 1];
-      const update = encodeStateAsUpdate(this.doc);
+      const update = Y.encodeStateAsUpdate(this.doc);
 
       // Note: a snapshot is a representation of the document
       // which is guarantueed to contain all events in the room
@@ -346,7 +337,6 @@ export class MatrixProvider extends lifecycle.Disposable {
 
       // TODO: current implementation uses polling to get room availability, but should be possible to get a real-time solution
       this.initializeTimeoutHandler = setTimeout(() => {
-        console.log("initializeTimeoutHandler");
         this.initialize();
       }, timeout);
       return;
@@ -355,29 +345,26 @@ export class MatrixProvider extends lifecycle.Disposable {
     // We have resolved the roomAlias (if necessary)
     // Now fetch all relevant events for the room to initialize the YDoc
 
-    let initialLocalState = encodeStateAsUpdate(this.doc);
-    console.log({ initialLocalState });
+    let initialLocalState = Y.encodeStateAsUpdate(this.doc);
     const initialLocalStateVector =
-      encodeStateVectorFromUpdate(initialLocalState);
-    console.log({ initialLocalStateVector });
-    const deleteSetOnlyUpdate = diffUpdate(
+      Y.encodeStateVectorFromUpdate(initialLocalState);
+    const deleteSetOnlyUpdate = Y.diffUpdate(
       initialLocalState,
       initialLocalStateVector
     );
 
-    let oldSnapshot = snapshot(this.doc);
-    console.log({ oldSnapshot });
+    let oldSnapshot = Y.snapshot(this.doc);
     // This can fail because of no access to room. Because the room history should always be available,
     // we don't catch this event here
     const update = await this.initializeReader();
-    console.log({ update });
+
     this._onDocumentAvailable.fire();
 
     // Next, find if there are local changes that haven't been synced to the server
-    const remoteStateVector = encodeStateVectorFromUpdate(update);
-    console.log({ remoteStateVector });
-    const missingOnServer = diffUpdate(initialLocalState, remoteStateVector);
-    console.log({ missingOnServer });
+    const remoteStateVector = Y.encodeStateVectorFromUpdate(update);
+
+    const missingOnServer = Y.diffUpdate(initialLocalState, remoteStateVector);
+
     // missingOnServer will always contain the entire deleteSet on startup.
     // Unfortunately diffUpdate doesn't work well with deletes. In the if-statement
     // below, we try to detect when missingOnServer only contains the deleteSet, with
@@ -386,15 +373,12 @@ export class MatrixProvider extends lifecycle.Disposable {
     if (
       arrayBuffersAreEqual(deleteSetOnlyUpdate.buffer, missingOnServer.buffer)
     ) {
-      console.log("buffers equal");
       // TODO: instead of next 3 lines, we can probably get deleteSet directly from "update"
-      let serverDoc = new Doc();
-      applyUpdate(serverDoc, update);
-      let serverSnapshot = snapshot(serverDoc);
-      console.log("serverSnapshot", serverSnapshot);
+      let serverDoc = new Y.Doc();
+      Y.applyUpdate(serverDoc, update);
+      let serverSnapshot = Y.snapshot(serverDoc);
       // TODO: could also compare whether snapshot equal? instead of snapshotContainsAllDeletes?
       if (snapshotContainsAllDeletes(serverSnapshot, oldSnapshot)) {
-        console.log("snapshotContainsAllDeletes");
         // missingOnServer only contains a deleteSet with items that are already in the deleteSet on server
         this.initializedResolve();
         return;
@@ -402,10 +386,9 @@ export class MatrixProvider extends lifecycle.Disposable {
     }
 
     if (missingOnServer.length > 2) {
-      console.log("missingOnServer.length", missingOnServer.length);
       this.throttledWriter.writeUpdate(missingOnServer);
     }
-    console.log("calling final initializedResolve");
+
     this.initializedResolve();
   }
 
@@ -472,8 +455,8 @@ export class MatrixProvider extends lifecycle.Disposable {
 
 // adapted from yjs snapshot equals function
 function snapshotContainsAllDeletes(
-  newSnapshot: Snapshot,
-  oldSnapshot: Snapshot
+  newSnapshot: Y.Snapshot,
+  oldSnapshot: Y.Snapshot
 ) {
   // only contains deleteSet
   for (const [client, dsitems1] of oldSnapshot.ds.clients.entries()) {
