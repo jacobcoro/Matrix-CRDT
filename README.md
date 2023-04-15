@@ -1,6 +1,6 @@
 # Matrix CRDT
 
-<a href="https://discord.gg/aDQxXezfNj"><img alt="Discord" src="https://img.shields.io/badge/Chat on discord%20-%237289DA.svg?&style=for-the-badge&logo=discord&logoColor=white"/></a> <a href="https://matrix.to/#/#beyond-chat:matrix.org"><img alt="Matrix" src="https://img.shields.io/badge/Chat on matrix%20-%23000.svg?&style=for-the-badge&logo=matrix&logoColor=white"/></a>
+<a href="https://discord.gg/aDQxXezfNj"><img alt="Discord" src="https://img.shields.io/badge/Chat on discord%20-%237289DA.svg?&style=for-the-badge&logo=discord&logoColor=white"/></a> <a href="https://matrix.to/#/#matrixcrdt:matrix.org"><img alt="Matrix" src="https://img.shields.io/badge/Chat on matrix%20-%23000.svg?&style=for-the-badge&logo=matrix&logoColor=white"/></a>
 
 [![npm version](https://badge.fury.io/js/matrix-crdt.svg)](https://badge.fury.io/js/matrix-crdt) [![Coverage Status](https://coveralls.io/repos/github/YousefED/Matrix-CRDT/badge.svg?branch=main)](https://coveralls.io/github/YousefED/Matrix-CRDT?branch=main)
 
@@ -92,6 +92,8 @@ yarray.observe((event) => {
 // add 1 to the sum
 yarray.push([1]); // => "new sum: 1"
 ```
+
+**Note for Vite / non-webpack** If you're using Vite, or other non-webpack builds, note that matrix-js-sdk depends on certain polyfills available. See the [Vite example](examples/todo-simple-react-vite/) and [this issue on matrix-js-sdk](https://github.com/matrix-org/matrix-js-sdk/issues/2903).
 
 ## SyncedStore
 
